@@ -28,6 +28,7 @@
 #include <utility>
 #include <cstdint>
 #include <string_view>
+#include <bit>
 
 #include <gsl/gsl>
 
@@ -39,5 +40,11 @@ namespace jpeg_lite::decoder::transform
 
 [[nodiscard]] int16_t binary_string_to_int16(std::string_view sv);
 
-[[nodiscard]] int16_t value_category(int16_t val);
+[[nodiscard]] static inline FORCE_INLINE constexpr int16_t value_category(int16_t val)
+{
+	if (val == 0x0000)
+		return 0;
+
+	return std::bit_width(static_cast<uint16_t>(val > 0 ? val : -val));
+}
 }
