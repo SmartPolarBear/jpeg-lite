@@ -24,6 +24,8 @@
 
 #include "helper/huffman_tree.h"
 
+#include <stdexcept>
+
 using namespace jpeg_lite::utility;
 
 jpeg_lite::utility::huffman_tree::huffman_tree()
@@ -33,15 +35,53 @@ jpeg_lite::utility::huffman_tree::huffman_tree()
 
 void jpeg_lite::utility::huffman_tree::node::insert_left(uint16_t val)
 {
+	if (left_)
+	{
+		throw std::runtime_error("Already have left child");
+	}
 
+	left_ = std::make_shared<huffman_tree::node>(shared_from_this(), val);
+	left_->code_.append("0");
 }
 
 void jpeg_lite::utility::huffman_tree::node::insert_right(uint16_t val)
 {
+	if (right_)
+	{
+		throw std::runtime_error("Already have right child");
+	}
 
+	right_ = std::make_shared<huffman_tree::node>(shared_from_this(), val);
+	right_->code_.append("1");
 }
 
 std::shared_ptr<huffman_tree::node> jpeg_lite::utility::huffman_tree::node::right_sibling()
 {
-	return std::shared_ptr<node>();
+	auto pa = parent_.lock();
+
+	if (pa && pa->left_.get() == this)
+	{
+		return pa->right_;
+	}
+
+	int level = 0;
+	auto iter = shared_from_this();
+	while (iter->parent_.lock() && iter->parent_.lock()->right_ == iter)
+	{
+		iter = iter->parent_.lock();
+		level++;
+	}
+
+	if (!iter->parent_.lock()) // parent
+	{
+		return nullptr;
+	}
+
+	while (level > 0)
+	{
+		iter = iter->left_;
+		level--;
+	}
+
+	return iter;
 }
