@@ -23,3 +23,25 @@
 //
 
 #include "helper/huffman_tree.h"
+
+using namespace jpeg_lite::utility;
+
+jpeg_lite::utility::huffman_tree::huffman_tree()
+		: root_(std::make_shared<node>(nullptr, 0))
+{
+}
+
+void jpeg_lite::utility::huffman_tree::node::insert_left(uint16_t val)
+{
+
+}
+
+void jpeg_lite::utility::huffman_tree::node::insert_right(uint16_t val)
+{
+
+}
+
+std::shared_ptr<huffman_tree::node> jpeg_lite::utility::huffman_tree::node::right_sibling()
+{
+	return std::shared_ptr<node>();
+}

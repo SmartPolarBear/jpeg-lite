@@ -22,7 +22,38 @@
 // Created by cleve on 2/2/2022.
 //
 
-#ifndef JPEG_LITE_HUFFMAN_TREE_H
-#define JPEG_LITE_HUFFMAN_TREE_H
+#include <string>
+#include <memory>
 
-#endif //JPEG_LITE_HUFFMAN_TREE_H
+namespace jpeg_lite::utility
+{
+class huffman_tree
+{
+public:
+	huffman_tree();
+
+private:
+	class node : public std::enable_shared_from_this<node>
+	{
+	public:
+		node() = default;
+
+		explicit node(const std::shared_ptr<node>& parent, uint16_t value) : parent_(parent), value_(value)
+		{
+		}
+
+		void insert_left(uint16_t val);
+		void insert_right(uint16_t val);
+
+		std::shared_ptr<node> right_sibling();
+	private:
+		uint16_t value_{ 0 };
+		std::string code_{};
+
+		std::shared_ptr<node> left_{ nullptr }, right_{ nullptr };
+		std::weak_ptr<node> parent_{};
+	};
+
+	const std::shared_ptr<node> root_{ nullptr };
+};
+}
