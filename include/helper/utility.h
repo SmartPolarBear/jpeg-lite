@@ -22,7 +22,19 @@
 // Created by cleve on 2/1/2022.
 //
 
-#ifndef JPEG_LITE2_UTILITY_H
-#define JPEG_LITE2_UTILITY_H
+#pragma once
 
-#endif //JPEG_LITE2_UTILITY_H
+#include "types.h"
+
+#include <string_view>
+#include <cctype>
+
+namespace jpeg_lite::utility
+{
+static inline FORCE_INLINE bool IS_WHITESPACE(char c)
+{
+	return iscntrl(c) || isblank(c) || isspace(c);
+}
+
+bool is_whitespace_string(std::string_view sv);
+}

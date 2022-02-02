@@ -21,8 +21,23 @@
 //
 // Created by cleve on 2/1/2022.
 //
+#pragma once
 
-#ifndef JPEG_LITE2_TRANSFORM_H
-#define JPEG_LITE2_TRANSFORM_H
+#include "types.h"
 
-#endif //JPEG_LITE2_TRANSFORM_H
+#include <utility>
+#include <cstdint>
+#include <string_view>
+
+#include <gsl/gsl>
+
+namespace jpeg_lite::decoder::transform
+{
+[[nodiscard]] FORCE_INLINE gsl::index coordinate_to_zigzag(gsl::index x, gsl::index y);
+
+[[nodiscard]] FORCE_INLINE std::pair<gsl::index, gsl::index> zigzag_to_coordinate(gsl::index zigzag);
+
+[[nodiscard]] int16_t binary_string_to_int16(std::string_view sv);
+
+[[nodiscard]] int16_t value_category(int16_t val);
+}

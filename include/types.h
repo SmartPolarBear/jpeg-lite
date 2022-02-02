@@ -19,17 +19,13 @@
 // SOFTWARE.
 
 //
-// Created by cleve on 2/1/2022.
+// Created by cleve on 2/2/2022.
 //
 
-#include "helper/utility.h"
+#pragma once
 
-#include <algorithm>
-
-bool jpeg_lite::utility::is_whitespace_string(std::string_view sv)
-{
-	return std::ranges::all_of(sv, [](char c)
-	{
-		return IS_WHITESPACE(c);
-	});
-}
+#ifdef _MSC_VER
+#define FORCE_INLINE __forceinline
+#else
+#define FORCE_INLINE inline
+#endif
