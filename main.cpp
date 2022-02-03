@@ -20,9 +20,43 @@
 
 
 #include <iostream>
+#include <string>
+#include <filesystem>
+#include <format>
 
-int main()
+#include <argparse/argparse.hpp>
+
+using namespace std;
+
+int main(int argc, char* argv[])
 {
-	std::cout << "Hello, World!" << std::endl;
+	argparse::ArgumentParser arg_parser{ "jpeg_lite" };
+
+	arg_parser.add_argument("-i", "--image")
+			.help("the JPEG image file")
+			.required()
+			.nargs(1);
+
+	try
+	{
+		arg_parser.parse_args(argc, argv);
+	}
+	catch (const std::runtime_error& err)
+	{
+		cerr << err.what() << endl;
+		cerr << arg_parser;
+		return 1;
+	}
+
+	const auto img = arg_parser.get<string>("--image");
+
+	if (!filesystem::exists(img))
+	{
+		cerr << format("{} does not exist.", img) << endl;
+		return 1;
+	}
+
+
+
 	return 0;
 }
