@@ -38,7 +38,7 @@ namespace jpeg_lite::decoder::transform
 
 [[nodiscard]] FORCE_INLINE std::pair<gsl::index, gsl::index> zigzag_to_coordinate(gsl::index zigzag);
 
-[[nodiscard]] int16_t binary_string_to_int16(std::string_view sv);
+[[nodiscard, maybe_unused]] int16_t binary_string_to_int16(std::string_view sv);
 
 [[nodiscard]] static inline FORCE_INLINE constexpr int16_t value_category(int16_t val)
 {

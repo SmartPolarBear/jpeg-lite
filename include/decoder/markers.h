@@ -32,7 +32,7 @@ namespace jpeg_lite::decoder
 enum jfif_markers
 {
 	JFIF_BYTE_0 = 0x00,
-	
+
 	JFIF_BYTE_FF = 0xFF, // All markers start with this as the MSB
 	JFIF_SOF0 = 0xC0, // Start of Frame 0, Baseline DCT
 	JFIF_SOF1 = 0xC1, // Start of Frame 1, Extended Sequential DCT
@@ -54,5 +54,34 @@ enum jfif_markers
 	JFIF_DQT = 0xDB, // Define Quantization Table
 	JFIF_APP0 = 0xE0, // Application Segment 0, JPEG-JFIF Image
 	JFIF_COM = 0xFE, // Comment
+
+	JFIF_MARKERS_MAX
+};
+}
+
+#include <magic_enum.hpp>
+
+namespace magic_enum
+{
+template<>
+struct customize::enum_range<jpeg_lite::decoder::jfif_markers>
+{
+	static constexpr int min = (int)jpeg_lite::decoder::jfif_markers::JFIF_BYTE_0;
+	static constexpr int max = (int)jpeg_lite::decoder::jfif_markers::JFIF_MARKERS_MAX;
+};
+}
+
+#include <string>
+#include <format>
+
+namespace std
+{
+template<>
+struct std::formatter<jpeg_lite::decoder::jfif_markers> : std::formatter<std::string>
+{
+	auto format(jpeg_lite::decoder::jfif_markers m, format_context& ctx)
+	{
+		return formatter<string>::format(std::string{ magic_enum::enum_name(m) }, ctx);
+	}
 };
 }

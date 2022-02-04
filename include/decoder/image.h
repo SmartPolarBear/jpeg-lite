@@ -19,13 +19,27 @@
 // SOFTWARE.
 
 //
-// Created by cleve on 2/2/2022.
+// Created by cleve on 2/4/2022.
 //
 
 #pragma once
 
-#ifdef _MSC_VER
-#define FORCE_INLINE __forceinline
-#else
-#define FORCE_INLINE inline
-#endif
+#include <string_view>
+#include <memory>
+
+namespace jpeg_lite::decoder
+{
+class jpeg_image
+{
+public:
+	[[nodiscard]] explicit jpeg_image(std::string_view file);
+
+	~jpeg_image() = default;
+
+private:
+	void parse_segments();
+
+	const size_t size_{0};
+	std::unique_ptr<char[]> data_{};
+};
+}

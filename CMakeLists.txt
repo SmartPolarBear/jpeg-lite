@@ -13,6 +13,7 @@ target_include_directories(jpeg_lite PRIVATE include)
 add_subdirectory(libs)
 target_link_libraries(jpeg_lite
         PRIVATE GSL
+        PRIVATE magic_enum
         PRIVATE argparse)
 
 add_subdirectory(helper)

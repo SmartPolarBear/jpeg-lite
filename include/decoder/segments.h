@@ -19,13 +19,35 @@
 // SOFTWARE.
 
 //
-// Created by cleve on 2/2/2022.
+// Created by cleve on 2/4/2022.
 //
-
 #pragma once
 
-#ifdef _MSC_VER
-#define FORCE_INLINE __forceinline
-#else
-#define FORCE_INLINE inline
-#endif
+#include "decoder/markers.h"
+
+#include <type_traits>
+#include <format>
+#include <cstdint>
+
+
+namespace jpeg_lite::decoder
+{
+
+#pragma pack(push, 1)
+struct segment_header
+{
+	uint16_t marker;
+	uint16_t length;
+};
+#pragma pack(pop)
+
+std::string to_string(const jpeg_lite::decoder::segment_header& seg)
+{
+	return std::format("<Segment {}, length {}>\n", static_cast<jfif_markers>(seg.marker), seg.length);
+}
+
+static_assert(std::is_standard_layout_v<segment_header>);
+static_assert(sizeof(segment_header) == 4);
+
+}
+

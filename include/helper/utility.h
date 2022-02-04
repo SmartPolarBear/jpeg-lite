@@ -31,6 +31,7 @@
 
 namespace jpeg_lite::utility
 {
+
 static inline FORCE_INLINE bool IS_WHITESPACE(char c)
 {
 	return iscntrl(c) || isblank(c) || isspace(c);
