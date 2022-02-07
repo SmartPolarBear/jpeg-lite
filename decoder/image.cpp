@@ -69,6 +69,6 @@ void jpeg_lite::decoder::jpeg_image::parse_segments()
 	{
 		auto h = reinterpret_cast<segment_header*>(data_.get() + pos);
 		clog << to_string(*h);
-		pos += h->length;
+		pos += length_of(*h);
 	}
 }

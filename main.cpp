@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include "decoder/image.h"
 
 #include <iostream>
 #include <string>
@@ -25,6 +26,8 @@
 #include <format>
 
 #include <argparse/argparse.hpp>
+
+using namespace jpeg_lite::decoder;
 
 using namespace std;
 
@@ -57,6 +60,7 @@ int main(int argc, char* argv[])
 	}
 
 
+	jpeg_image image{ img };
 
 	return 0;
 }
