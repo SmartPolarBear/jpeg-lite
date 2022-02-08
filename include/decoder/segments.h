@@ -30,6 +30,7 @@
 #include <cstdint>
 #include <bit>
 #include <concepts>
+#include <ranges>
 
 namespace jpeg_lite::decoder
 {
@@ -50,9 +51,17 @@ static inline constexpr auto value_of(T&& value)
 	return std::byteswap(std::forward<T>(value));
 }
 
+static inline constexpr auto value_transform = std::views::transform([](uint8_t value)
+{ return value_of(value); });
+
+static inline constexpr jfif_markers marker_of(const segment_header& sh)
+{
+	return static_cast<jfif_markers>(value_of(sh.marker));
+}
+
 static inline constexpr size_t length_of(const segment_header& sh)
 {
-	if (const auto marker = static_cast<jfif_markers>(value_of(sh.marker));marker == JFIF_EOI || marker == JFIF_SOI)
+	if (const auto marker = marker_of(sh);marker == JFIF_EOI || marker == JFIF_SOI)
 	{
 		return 2;
 	}
@@ -63,12 +72,22 @@ static inline constexpr size_t length_of(const segment_header& sh)
 std::string to_string(const jpeg_lite::decoder::segment_header& seg)
 {
 	auto m = value_of(seg.marker);
-	return std::format("<Segment {}, length {}>\n", static_cast<jfif_markers>(value_of(seg.marker)),
+	return std::format("<Segment {}, length {}>\n", marker_of(seg),
 			length_of(seg));
 }
 
 static_assert(std::is_standard_layout_v<segment_header>);
 static_assert(sizeof(segment_header) == 4);
+
+#pragma pack(push, 1)
+struct dht_segment
+{
+	segment_header header;
+	uint8_t flags;
+	uint8_t counts[16];
+	uint8_t symbols[0];
+};
+#pragma pack(pop)
 
 }
 

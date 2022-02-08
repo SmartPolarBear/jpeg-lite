@@ -27,6 +27,8 @@
 #include <string_view>
 #include <memory>
 
+#include <gsl/gsl>
+
 namespace jpeg_lite::decoder
 {
 class jpeg_image
@@ -38,6 +40,8 @@ public:
 
 private:
 	void parse_segments();
+
+	void parse_huffman(gsl::index pos);
 
 	const size_t size_{0};
 	std::unique_ptr<char[]> data_{};

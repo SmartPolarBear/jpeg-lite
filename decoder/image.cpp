@@ -30,6 +30,8 @@
 #include <format>
 #include <stdexcept>
 #include <filesystem>
+#include <ranges>
+#include <span>
 
 #include <gsl/gsl>
 
@@ -37,6 +39,7 @@ using namespace jpeg_lite::decoder;
 
 using namespace std;
 using namespace gsl;
+using namespace std::views;
 
 jpeg_lite::decoder::jpeg_image::jpeg_image(std::string_view file)
 		: size_(filesystem::file_size(file.data())),
@@ -69,6 +72,80 @@ void jpeg_lite::decoder::jpeg_image::parse_segments()
 	{
 		auto h = reinterpret_cast<segment_header*>(data_.get() + pos);
 		clog << to_string(*h);
+
+		switch (marker_of(*h))
+		{
+		case JFIF_SOF0:
+			break;
+		case JFIF_SOF1:
+			break;
+		case JFIF_SOF2:
+			break;
+		case JFIF_SOF3:
+			break;
+		case JFIF_DHT:
+			parse_huffman(pos);
+//			pos += length_of(*h);
+			break;
+		case JFIF_SOF5:
+			break;
+		case JFIF_SOF6:
+			break;
+		case JFIF_SOF7:
+			break;
+		case JFIF_SOF9:
+			break;
+		case JFIF_SOF10:
+			break;
+		case JFIF_SOF11:
+			break;
+		case JFIF_SOF13:
+			break;
+		case JFIF_SOF14:
+			break;
+		case JFIF_SOF15:
+			break;
+		case JFIF_SOI:
+			break;
+		case JFIF_EOI:
+			break;
+		case JFIF_SOS:
+			break;
+		case JFIF_DQT:
+			break;
+		case JFIF_APP0:
+			break;
+		case JFIF_COM:
+			break;
+		default:
+			pos += length_of(*h);
+			break;
+		}
+
 		pos += length_of(*h);
 	}
+}
+
+void jpeg_image::parse_huffman(gsl::index pos)
+{
+	const auto dht = reinterpret_cast<dht_segment*>(data_.get() + pos);
+	Expects(marker_of(dht->header) == JFIF_DHT);
+
+	clog << "Parsing DHT\nCounts:\n";
+
+	size_t total{ 0 };
+	for (const auto c:
+			dht->counts | value_transform)
+	{
+		clog << std::format("{} ", c);
+		total += c;
+	}
+	clog << "\nElements:\n";
+
+	std::span<uint8_t> symbols{ dht->symbols, total };
+	for (const auto symbol: symbols | value_transform)
+	{
+		clog << std::format("{} ", symbol);
+	}
+	clog << "\n";
 }
