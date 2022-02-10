@@ -24,30 +24,44 @@
 
 #include <string>
 #include <memory>
+#include <span>
+#include <optional>
 
 namespace jpeg_lite::utility
 {
 class huffman_tree
 {
 public:
-	huffman_tree();
+	using size_type = uint8_t;
+	using value_type = uint8_t;
+
+	huffman_tree(std::span<size_type> size, std::span<value_type> values);
+
+	std::optional<uint16_t>  decode(std::span<value_type> code);
 
 private:
 	class node : public std::enable_shared_from_this<node>
 	{
 	public:
+		friend class huffman_tree;
+
 		node() = default;
 
-		explicit node(const std::shared_ptr<node>& parent, uint16_t value) : parent_(parent), value_(value)
+		explicit node(const std::shared_ptr<node>& parent) : parent_(parent)
 		{
 		}
 
-		void insert_left(uint16_t val);
-		void insert_right(uint16_t val);
+		void complete_children();
 
 		std::shared_ptr<node> right_sibling();
+
 	private:
-		uint16_t value_{ 0 };
+		void insert_left();
+
+		void insert_right();
+
+
+		std::optional<uint16_t> value_{ 0 };
 		std::string code_{};
 
 		std::shared_ptr<node> left_{ nullptr }, right_{ nullptr };

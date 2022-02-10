@@ -44,6 +44,7 @@ struct segment_header
 };
 #pragma pack(pop)
 static_assert(sizeof(segment_header) == 4);
+static_assert(std::is_standard_layout_v<segment_header>);
 
 template<typename T>
 static inline constexpr auto value_of(T&& value)
@@ -88,6 +89,7 @@ struct dht_segment
 	uint8_t symbols[0];
 };
 #pragma pack(pop)
+static_assert(std::is_standard_layout_v<dht_segment>);
 
 }
 

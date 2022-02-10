@@ -25,33 +25,29 @@
 #include "helper/huffman_tree.h"
 
 #include <stdexcept>
+#include <gsl/gsl>
 
 using namespace jpeg_lite::utility;
 
-jpeg_lite::utility::huffman_tree::huffman_tree()
-		: root_(std::make_shared<node>(nullptr, 0))
-{
-}
-
-void jpeg_lite::utility::huffman_tree::node::insert_left(uint16_t val)
+void jpeg_lite::utility::huffman_tree::node::insert_left()
 {
 	if (left_)
 	{
 		throw std::runtime_error("Already have left child");
 	}
 
-	left_ = std::make_shared<huffman_tree::node>(shared_from_this(), val);
+	left_ = std::make_shared<huffman_tree::node>(shared_from_this());
 	left_->code_.append("0");
 }
 
-void jpeg_lite::utility::huffman_tree::node::insert_right(uint16_t val)
+void jpeg_lite::utility::huffman_tree::node::insert_right()
 {
 	if (right_)
 	{
 		throw std::runtime_error("Already have right child");
 	}
 
-	right_ = std::make_shared<huffman_tree::node>(shared_from_this(), val);
+	right_ = std::make_shared<huffman_tree::node>(shared_from_this());
 	right_->code_.append("1");
 }
 
@@ -85,3 +81,71 @@ std::shared_ptr<huffman_tree::node> jpeg_lite::utility::huffman_tree::node::righ
 
 	return iter;
 }
+
+void huffman_tree::node::complete_children()
+{
+	insert_left();
+	insert_right();
+}
+
+jpeg_lite::utility::huffman_tree::huffman_tree(std::span<size_type> size, std::span<value_type> values)
+		: root_(std::make_shared<node>(nullptr))
+{
+	root_->insert_left();
+	root_->insert_right();
+
+	auto left_most = root_->left_;
+
+	for (size_t consumed = 0; const auto s: size)
+	{
+		if (!s)
+		{
+			for (auto iter = left_most; iter; iter = iter->right_sibling())
+			{
+				iter->complete_children();
+				left_most = left_most->left_;
+			}
+		}
+		else
+		{
+			std::span<value_type> val = { values.data() + consumed, s };
+			for (const auto v: val)
+			{
+				left_most->value_ = v;
+				left_most = left_most->right_sibling();
+			}
+
+			left_most->complete_children();
+
+			auto iter = left_most->right_sibling();
+			left_most = left_most->left_;
+			while (iter)
+			{
+				iter->complete_children();
+				iter = iter->right_sibling();
+			}
+		}
+		consumed += s;
+	}
+}
+
+std::optional<uint16_t> huffman_tree::decode(std::span<value_type> code)
+{
+	Expects(!code.empty());
+	auto iter = root_;
+	for (gsl::index i{ 0 }; const auto c : code){
+		auto bit = ((c >> i) & 1);
+		if (bit)
+		{
+			iter = iter->left_;
+		}
+		else
+		{
+			iter = iter->right_;
+		}
+		i = (i + 1) % 16;
+	}
+	Ensures(iter);
+	return iter->value_;
+}
+

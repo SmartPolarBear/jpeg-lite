@@ -131,7 +131,10 @@ void jpeg_image::parse_huffman(gsl::index pos)
 	const auto dht = reinterpret_cast<dht_segment*>(data_.get() + pos);
 	Expects(marker_of(dht->header) == JFIF_DHT);
 
-	clog << "Parsing DHT\nCounts:\n";
+	const auto flags = value_of(dht->flags);
+	clog << std::format("Parsing DHT {},{}\nCounts:\n",
+			flags & 0xF,
+			((flags >> 4) & 0b1) ? "AC" : "DC");
 
 	size_t total{ 0 };
 	for (const auto c:
